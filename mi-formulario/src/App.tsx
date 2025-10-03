@@ -76,6 +76,7 @@ export default function VehicleInspectionForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Auto-complete form when Quality Control OK is checked
   useEffect(() => {
@@ -186,13 +187,13 @@ export default function VehicleInspectionForm() {
     
     setIsSubmitting(true);
     setSubmitError("");
+    setSubmitSuccess(false);
     
     try {
       // Prepare data for submission
       const submissionData: any = {
         "Control Calidad": qualityControlName,
         "Fecha de Control": controlDate,
-        "Control Calidad OK": qualityControlOK ? "Sí" : "No"
       };
       
       // Add questions and answers
@@ -212,18 +213,19 @@ export default function VehicleInspectionForm() {
       // Send data to Google Sheets
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors", // Required for Google Apps Script
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams(submissionData).toString(),
       });
       
-      // Note: With no-cors mode, we can't read the response
-      // In a real implementation, you might want to use a proxy server
-      // or implement a proper CORS solution
-      
-      setIsSubmitted(true);
+      // Check response
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setIsSubmitted(true);
+      } else {
+        throw new Error(`Error: ${response.status}`);
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmitError("Hubo un error al enviar el formulario. Por favor intente nuevamente.");
@@ -244,6 +246,7 @@ export default function VehicleInspectionForm() {
     setDateError(false);
     setIsSubmitted(false);
     setSubmitError("");
+    setSubmitSuccess(false);
   };
 
   if (isSubmitted) {
@@ -389,6 +392,12 @@ export default function VehicleInspectionForm() {
               {submitError && (
                 <div className="text-red-500 text-center py-2">
                   {submitError}
+                </div>
+              )}
+
+              {submitSuccess && (
+                <div className="text-green-600 text-center py-2">
+                  ¡Datos guardados correctamente!
                 </div>
               )}
 
