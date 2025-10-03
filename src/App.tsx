@@ -198,7 +198,6 @@ export default function VehicleInspectionForm() {
       };
       questions.forEach((question, index) => {
         const answer = formData[question] || (qualityControlOK ? "correcto" : "");
-        submissionData[`Pregunta ${index + 1}`] = question;
         submissionData[`Respuesta ${index + 1}`] = answer;
         submissionData[`Observación ${index + 1}`] = answer === "deficiente" ? (observations[question] || "") : "No Aplica";
       });
