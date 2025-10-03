@@ -1,7 +1,5 @@
-// api/save.cjs
-const fetch = require("node-fetch");
-
-module.exports = async (req, res) => {
+// api/save.js
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ ok: false, message: "Method Not Allowed" });
     return;
@@ -10,7 +8,7 @@ module.exports = async (req, res) => {
   try {
     const GAS_URL = process.env.GAS_URL;
     if (!GAS_URL) {
-      throw new Error("GAS_URL no está configurada en las variables de entorno");
+      throw new Error("Falta la variable de entorno GAS_URL en Vercel");
     }
 
     const body = req.body || {};
@@ -43,4 +41,4 @@ module.exports = async (req, res) => {
     console.error("Error en /api/save:", err);
     res.status(500).json({ ok: false, error: String(err) });
   }
-};
+}
