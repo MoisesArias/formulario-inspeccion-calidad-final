@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 
 interface FormData {
   [key: string]: string;
@@ -61,6 +61,8 @@ const answerOptions = [
   { value: "no-aplica", label: "No Aplica" },
 ];
 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV1Y6qYJ1h9jX6Q5K5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J/exec";
+
 export default function VehicleInspectionForm() {
   const [qualityControlName, setQualityControlName] = useState("");
   const [controlDate, setControlDate] = useState("");
@@ -72,6 +74,8 @@ export default function VehicleInspectionForm() {
   const [qualityControlError, setQualityControlError] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Auto-complete form when Quality Control OK is checked
   useEffect(() => {
@@ -173,18 +177,58 @@ export default function VehicleInspectionForm() {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      setIsSubmitted(true);
-      // In a real app, you would send the data to a server here
-      console.log("Form submitted:", { 
-        qualityControlName, 
-        controlDate, 
-        qualityControlOK, 
-        formData, 
-        observations 
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setSubmitError("");
+    
+    try {
+      // Prepare data for submission
+      const submissionData: any = {
+        "Control Calidad": qualityControlName,
+        "Fecha de Control": controlDate,
+        "Control Calidad OK": qualityControlOK ? "Sí" : "No"
+      };
+      
+      // Add questions and answers
+      questions.forEach((question, index) => {
+        const answer = formData[question] || (qualityControlOK ? "correcto" : "");
+        submissionData[`Pregunta ${index + 1}`] = question;
+        submissionData[`Respuesta ${index + 1}`] = answer;
+        
+        // Add observations
+        if (answer === "deficiente") {
+          submissionData[`Observación ${index + 1}`] = observations[question] || "";
+        } else {
+          submissionData[`Observación ${index + 1}`] = "No Aplica";
+        }
       });
+      
+      // Send data to Google Sheets
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", // Required for Google Apps Script
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(submissionData).toString(),
+      });
+      
+      // Note: With no-cors mode, we can't read the response
+      // In a real implementation, you might want to use a proxy server
+      // or implement a proper CORS solution
+      
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setSubmitError("Hubo un error al enviar el formulario. Por favor intente nuevamente.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -199,6 +243,7 @@ export default function VehicleInspectionForm() {
     setQualityControlError(false);
     setDateError(false);
     setIsSubmitted(false);
+    setSubmitError("");
   };
 
   if (isSubmitted) {
@@ -341,9 +386,26 @@ export default function VehicleInspectionForm() {
                 ))}
               </div>
 
+              {submitError && (
+                <div className="text-red-500 text-center py-2">
+                  {submitError}
+                </div>
+              )}
+
               <div className="pt-4">
-                <Button type="submit" className="w-full py-6 text-lg">
-                  Registrar Control de Calidad
+                <Button 
+                  type="submit" 
+                  className="w-full py-6 text-lg"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    "Registrar Control de Calidad"
+                  )}
                 </Button>
               </div>
             </form>
