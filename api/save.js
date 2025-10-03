@@ -20,8 +20,8 @@ export default async function handler(req, res) {
 
     const resp = await fetch(GAS_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
 
     const text = await resp.text();
