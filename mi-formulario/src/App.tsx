@@ -189,49 +189,46 @@ export default function VehicleInspectionForm() {
     setSubmitError("");
     setSubmitSuccess(false);
     
+    // En tu handleSubmit (frontend)
     try {
-      // Prepare data for submission
-      const submissionData: any = {
+      // Prepare data (igual que antes)
+      const submissionData: Record<string, any> = {
         "Control Calidad": qualityControlName,
         "Fecha de Control": controlDate,
       };
-      
-      // Add questions and answers
       questions.forEach((question, index) => {
         const answer = formData[question] || (qualityControlOK ? "correcto" : "");
         submissionData[`Pregunta ${index + 1}`] = question;
         submissionData[`Respuesta ${index + 1}`] = answer;
-        
-        // Add observations
-        if (answer === "deficiente") {
-          submissionData[`Observación ${index + 1}`] = observations[question] || "";
-        } else {
-          submissionData[`Observación ${index + 1}`] = "No Aplica";
-        }
+        submissionData[`Observación ${index + 1}`] = answer === "deficiente" ? (observations[question] || "") : "No Aplica";
       });
-      
-      // Send data to Google Sheets
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+
+      // Llamamos al proxy de Vercel (misma origin) que a su vez llama al GAS
+      const response = await fetch("/api/save", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams(submissionData).toString(),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submissionData),
       });
-      
-      // Check response
-      if (response.ok) {
+
+      // Leemos la respuesta del proxy (que contiene lo que devolvió GAS)
+      const result = await response.json();
+
+      if (response.ok && result.ok) {
+        // Éxito
         setSubmitSuccess(true);
         setIsSubmitted(true);
       } else {
-        throw new Error(`Error: ${response.status}`);
+        // Falló por algo (GAS devolvió error o el status no es 200)
+        const errMsg = result?.data?.message || result?.error || `HTTP ${result?.status || response.status}`;
+        setSubmitError("Error al guardar: " + errMsg);
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error en submit:", error);
       setSubmitError("Hubo un error al enviar el formulario. Por favor intente nuevamente.");
     } finally {
       setIsSubmitting(false);
     }
+
   };
 
   const resetForm = () => {
