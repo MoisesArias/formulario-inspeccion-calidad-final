@@ -61,7 +61,7 @@ const answerOptions = [
   { value: "no-aplica", label: "No Aplica" },
 ];
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV1Y6qYJ1h9jX6Q5K5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwF-CjV5QYRg06_dJL_1dz4aluD-BWir6VsFx9gBtaKYSkW48XqyBZY08eT7T-4Dgc/exec";
 
 export default function VehicleInspectionForm() {
   const [qualityControlName, setQualityControlName] = useState("");
