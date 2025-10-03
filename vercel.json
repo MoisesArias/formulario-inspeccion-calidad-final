@@ -1,7 +1,6 @@
 {
   "version": 2,
   "builds": [
-    { "src": "mi-formulario/package.json", "use": "@vercel/node" },
     { "src": "mi-formulario/package.json", "use": "@vercel/static-build" }
   ],
   "framework": "vite"
