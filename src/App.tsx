@@ -423,100 +423,87 @@ export default function VehicleInspectionForm() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Responsible and Plate Fields */}
-              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
-                <div className="space-y-2">
-                  <Label htmlFor="responsible" className="text-sm font-medium text-gray-700">
-                    Responsable <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="responsible"
-                    value={responsible}
-                    onChange={(e) => {
-                      setResponsible(e.target.value);
-                      if (responsibleError) setResponsibleError(false);
-                    }}
-                    placeholder="Ingrese el nombre del responsable"
-                    className={responsibleError ? "border-red-500" : ""}
-                  />
-                  {responsibleError && (
-                    <p className="text-red-500 text-sm">El nombre del responsable es requerido</p>
-                  )}
-                </div>
+              <div className="mb-8 p-6 bg-blue-50 rounded-lg space-y-6">
                 
-                <div ref={plateRef} className="space-y-2">
-                  <Label htmlFor="plate" className="text-sm font-medium text-gray-700">
-                    Placa Vehiculo <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="plate"
-                    value={plateNumber}
-                    onChange={handlePlateChange}
-                    placeholder="Ingrese la placa del vehículo"
-                    className={plateError ? "border-red-500" : ""}
-                  />
-                  {plateError && (
-                    <p className="text-red-500 text-sm">La placa del vehículo es requerida</p>
-                  )}
-                </div>
-                
-                <div ref={dateRef} className="space-y-2">
-                  <Label htmlFor="date" className="text-sm font-medium text-gray-700">
-                    Fecha de Control <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={controlDate}
-                    onChange={(e) => {
-                      setControlDate(e.target.value);
-                      if (dateError) setDateError(false);
-                    }}
-                    className={dateError ? "border-red-500" : ""}
-                  />
-                  {dateError && (
-                    <p className="text-red-500 text-sm">La fecha de control es requerida</p>
-                  )}
-                </div>
-              </div>
+                {/* Primera fila */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Responsable */}
+                  <div ref={responsibleRef} className="space-y-2">
+                    <Label htmlFor="responsible">Responsable <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="responsible"
+                      value={responsible}
+                      onChange={(e) => {
+                        setResponsible(e.target.value);
+                        if (responsibleError) setResponsibleError(false);
+                      }}
+                      className={responsibleError ? "border-red-500" : ""}
+                    />
+                    {responsibleError && <p className="text-red-500 text-sm">El nombre del responsable es requerido</p>}
+                  </div>
 
-              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
-                <div ref={advisorRef} className="space-y-2">
-                  <Label htmlFor="advisor" className="text-sm font-medium text-gray-700">
-                    Asesor <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="advisor"
-                    value={advisor}
-                    onChange={(e) => {
-                      setAdvisor(e.target.value);
-                      if (advisorError) setAdvisorError(false);
-                    }}
-                    placeholder="Ingrese el asesor"
-                    className={advisorError ? "border-red-500" : ""}
-                  />
-                  {advisorError && (
-                    <p className="text-red-500 text-sm">El asesor es requerido</p>
-                  )}
+                  {/* Placa */}
+                  <div ref={plateRef} className="space-y-2">
+                    <Label htmlFor="plate">Placa Vehiculo <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="plate"
+                      value={plateNumber}
+                      onChange={handlePlateChange}
+                      className={plateError ? "border-red-500" : ""}
+                    />
+                    {plateError && <p className="text-red-500 text-sm">La placa del vehículo es requerida</p>}
+                  </div>
+
+                  {/* Fecha */}
+                  <div ref={dateRef} className="space-y-2">
+                    <Label htmlFor="date">Fecha de Control <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={controlDate}
+                      onChange={(e) => {
+                        setControlDate(e.target.value);
+                        if (dateError) setDateError(false);
+                      }}
+                      className={dateError ? "border-red-500" : ""}
+                    />
+                    {dateError && <p className="text-red-500 text-sm">La fecha de control es requerida</p>}
+                  </div>
                 </div>
 
-                <div ref={technicianRef} className="space-y-2">
-                  <Label htmlFor="technician" className="text-sm font-medium text-gray-700">
-                    Tecnico <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="technician"
-                    value={technician}
-                    onChange={(e) => {
-                      setTechnician(e.target.value);
-                      if (technicianError) setTechnicianError(false);
-                    }}
-                    placeholder="Ingrese el tecnico"
-                    className={technicianError ? "border-red-500" : ""}
-                  />
-                  {technicianError && (
-                    <p className="text-red-500 text-sm">El tecnico es requerido</p>
-                  )}
+                {/* Segunda fila */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Asesor */}
+                  <div ref={advisorRef} className="space-y-2">
+                    <Label htmlFor="advisor">Asesor <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="advisor"
+                      value={advisor}
+                      onChange={(e) => {
+                        setAdvisor(e.target.value);
+                        if (advisorError) setAdvisorError(false);
+                      }}
+                      className={advisorError ? "border-red-500" : ""}
+                    />
+                    {advisorError && <p className="text-red-500 text-sm">El asesor es requerido</p>}
+                  </div>
+
+                  {/* Técnico */}
+                  <div ref={technicianRef} className="space-y-2">
+                    <Label htmlFor="technician">Tecnico <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="technician"
+                      value={technician}
+                      onChange={(e) => {
+                        setTechnician(e.target.value);
+                        if (technicianError) setTechnicianError(false);
+                      }}
+                      className={technicianError ? "border-red-500" : ""}
+                    />
+                    {technicianError && <p className="text-red-500 text-sm">El tecnico es requerido</p>}
+                  </div>
                 </div>
+
               </div>
               
               {/* Quality Control OK Checkbox */}
