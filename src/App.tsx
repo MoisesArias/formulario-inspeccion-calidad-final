@@ -437,6 +437,7 @@ export default function VehicleInspectionForm() {
                         setResponsible(e.target.value);
                         if (responsibleError) setResponsibleError(false);
                       }}
+                      placeholder="Ingrese el nombre del responsable"
                       className={responsibleError ? "border-red-500" : ""}
                     />
                     {responsibleError && <p className="text-red-500 text-sm">El nombre del responsable es requerido</p>}
@@ -449,6 +450,7 @@ export default function VehicleInspectionForm() {
                       id="plate"
                       value={plateNumber}
                       onChange={handlePlateChange}
+                      placeholder="Ingrese la placa del vehículo"
                       className={plateError ? "border-red-500" : ""}
                     />
                     {plateError && <p className="text-red-500 text-sm">La placa del vehículo es requerida</p>}
@@ -483,6 +485,7 @@ export default function VehicleInspectionForm() {
                         setAdvisor(e.target.value);
                         if (advisorError) setAdvisorError(false);
                       }}
+                      placeholder="Ingrese el nombre del asesor"
                       className={advisorError ? "border-red-500" : ""}
                     />
                     {advisorError && <p className="text-red-500 text-sm">El asesor es requerido</p>}
@@ -498,6 +501,7 @@ export default function VehicleInspectionForm() {
                         setTechnician(e.target.value);
                         if (technicianError) setTechnicianError(false);
                       }}
+                      placeholder="Ingrese el nombre del tecnico"
                       className={technicianError ? "border-red-500" : ""}
                     />
                     {technicianError && <p className="text-red-500 text-sm">El tecnico es requerido</p>}
