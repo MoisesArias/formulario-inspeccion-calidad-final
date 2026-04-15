@@ -1,20 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, CheckCircle, AlertTriangle, XCircle, MinusCircle } from "lucide-react";
 
 interface FormData {
   [key: string]: string;
@@ -25,65 +19,82 @@ interface Observations {
 }
 
 const questions = [
-  "Refrigerante Radiador",
-  "Aceite Motor",
-  "Caja Mecánica / Automática",
-  "Dirección Hidráulica / Electro Asistida",
-  "Lava Vidrios",
-  "Líquido de Frenos / Embrague (si aplica)",
-  "Ajuste y Limpieza Bornes / Batería",
-  "Programación de Emisoras",
-  "Limpieza Protector",
-  "Iluminación Exterior / Interior",
-  "Funcionamiento Pito",
-  "Accionamiento Alarma",
-  "Bloqueo de Puertas",
-  "Testigos Luminosos",
-  "Funcionamiento Elevavidrios",
-  "Funcionamiento Espejos",
-  "Cambio de Aceite y Filtro Motor",
-  "Verificación de Extintor",
-  "Ajuste Freno de Parqueo",
-  "Funcionamiento Embrague",
-  "Funcionamiento del Control de Cambios",
-  "Fugas de Aceite del Motor",
-  "Fugas de Aceite en la Caja",
-  "Fugas del Refrigerante del Radiador",
-  "Control Automático de Luces",
-  "Funcionamiento Radio",
-  "Ajuste Pernos Ruedas",
+  "Verificacion de operaciones solicitadas por el cliente",
+  "Comprobar el vehiculo respecto a medidas",
+  "Revision torque de pernos, presion de neumaticos y labrado",
+  "Revisar los niveles de liquidos y estados de los depositos",
+  "Calidad de liquidos de frenos",
+  "Vano Motor: Control visual de los tubos flexibles",
+  "Comprobar limpia brisas y eyectores ajustados",
+  "Espejos retrovisores",
+  "Comprobar daños de transporte en lunestas, pintura, piezas",
+  "Inspeccion exterior (golpes, rayones)",
+  "Reprogramación de Mantenimiento",
+  "Revisar radio (Sintonizacion de emisoras)",
+  "Control visual de habitaculo: Estado y daños",
+  "Revisar funcionamiento del aire acondicionado",
+  "Inspeccion luces del vehiculo",
+  "Control de funcionamiento de prueba de ruta",
+  "Funcionamiento y estado de cinturones de seguridad",
+  "Inspeccion limpieza del vehiculo",
+  "Inspeccion testigos de tablero de instrumentos",
+  "Hoja de mantenimiento",
+  "Formato solicitud y cotizacion de repuesto",
+  "Consulta en EVA / Codificacion WIS - ASRA (Ejecución KDM y RECALL)",
+  "Formato FVVT (Formato diagnostico)",
+  "Test de entrada y test de salida a las horas adecuadas",
+  "Documentos de Garantias",
+  "Orden de Servicio (Firmas OT, HD, Factura, Check List MTO)",
 ];
 
 const answerOptions = [
-  { value: "correcto", label: "Correcto" },
-  { value: "deficiente", label: "Deficiente" },
-  { value: "corregido", label: "Corregido" },
-  { value: "no-aplica", label: "No Aplica" },
+  { value: "cumple", label: "Cumple", icon: CheckCircle, color: "bg-green-500" },
+  { value: "no-cumple", label: "No Cumple", icon: XCircle, color: "bg-red-500" },
+  { value: "n-a", label: "N/A", icon: MinusCircle, color: "bg-gray-500" },
 ];
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwF-CjV5QYRg06_dJL_1dz4aluD-BWir6VsFx9gBtaKYSkW48XqyBZY08eT7T-4Dgc/exec";
+const liquidOptions = [
+  { value: "buen-estado", label: "Buen Estado", icon: CheckCircle, color: "bg-green-500" },
+  { value: "atencion-pronto", label: "Atencion Pronto", icon: AlertTriangle, color: "bg-yellow-600" },
+  { value: "cambio-inmediato", label: "Cambio Inmediato", icon: XCircle, color: "bg-red-500" },
+  { value: "n-a", label: "N/A", icon: MinusCircle, color: "bg-gray-500" },
+];
 
 export default function VehicleInspectionForm() {
-  const [qualityControlName, setQualityControlName] = useState("");
+  const [responsible, setResponsible] = useState("");
+  const [plateNumber, setPlateNumber] = useState("");
   const [controlDate, setControlDate] = useState("");
   const [qualityControlOK, setQualityControlOK] = useState(false);
   const [formData, setFormData] = useState<FormData>({});
   const [observations, setObservations] = useState<Observations>({});
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [observationErrors, setObservationErrors] = useState<Record<string, boolean>>({});
-  const [qualityControlError, setQualityControlError] = useState(false);
+  const [responsibleError, setResponsibleError] = useState(false);
+  const [plateError, setPlateError] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  // Refs for scrolling to errors
+  const responsibleRef = useRef<HTMLDivElement | null>(null);
+  const plateRef = useRef<HTMLDivElement | null>(null);
+  const dateRef = useRef<HTMLDivElement | null>(null);
+  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   // Auto-complete form when Quality Control OK is checked
   useEffect(() => {
     if (qualityControlOK) {
       const autoCompletedData: FormData = {};
       questions.forEach(question => {
-        autoCompletedData[question] = "correcto";
+        // For liquid-related questions, use "buen-estado", otherwise "cumple"
+        const isLiquidQuestion = question.includes("liquidos") || 
+                                question.includes("Calidad de") || 
+                                question.includes("Estado y daños") || 
+                                question.includes("aire acondicionado") || 
+                                question.includes("tablero de instrumentos");
+        autoCompletedData[question] = isLiquidQuestion ? "buen-estado" : "cumple";
       });
       setFormData(autoCompletedData);
       
@@ -97,8 +108,9 @@ export default function VehicleInspectionForm() {
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Clear observation if not "deficiente"
-    if (value !== "deficiente") {
+    // Clear observation if not an observation-triggering value
+    const shouldShowObservation = value === "no-cumple" || value === "atencion-pronto" || value === "cambio-inmediato";
+    if (!shouldShowObservation) {
       setObservations((prev) => {
         const newObservations = { ...prev };
         delete newObservations[name];
@@ -134,21 +146,53 @@ export default function VehicleInspectionForm() {
     }
   };
 
+  const handlePlateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow letters and numbers, convert to uppercase
+    const formattedValue = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    setPlateNumber(formattedValue);
+    
+    // Clear error when user types
+    if (plateError) setPlateError(false);
+  };
+
+  const scrollToError = (elementRef: React.RefObject<HTMLDivElement>) => {
+    if (elementRef.current) {
+      elementRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, boolean> = {};
     const newObservationErrors: Record<string, boolean> = {};
+    let firstErrorRef: React.RefObject<HTMLDivElement | null> | null = null;
     let isValid = true;
     
-    // Validate quality control name and date
-    if (!qualityControlName.trim()) {
-      setQualityControlError(true);
+    // Validate responsible
+    if (!responsible.trim()) {
+      setResponsibleError(true);
+      if (!firstErrorRef) firstErrorRef = responsibleRef;
       isValid = false;
     } else {
-      setQualityControlError(false);
+      setResponsibleError(false);
     }
     
+    // Validate plate number
+    if (!plateNumber.trim()) {
+      setPlateError(true);
+      if (!firstErrorRef) firstErrorRef = plateRef;
+      isValid = false;
+    } else {
+      setPlateError(false);
+    }
+    
+    // Validate date
     if (!controlDate) {
       setDateError(true);
+      if (!firstErrorRef) firstErrorRef = dateRef;
       isValid = false;
     } else {
       setDateError(false);
@@ -156,17 +200,24 @@ export default function VehicleInspectionForm() {
     
     // Only validate questions if Quality Control OK is not checked
     if (!qualityControlOK) {
-      questions.forEach((question) => {
+      questions.forEach((question, index) => {
         // Validate main selection
         if (!formData[question]) {
           newErrors[question] = true;
+          const refEl = questionRefs.current[index];
+          if (!firstErrorRef && refEl) firstErrorRef = { current: refEl };
           isValid = false;
         }
         
-        // Validate observation if "deficiente" is selected
-        if (formData[question] === "deficiente") {
+        // Validate observation if observation-triggering value is selected
+        const shouldShowObservation = formData[question] === "no-cumple" || 
+                                     formData[question] === "atencion-pronto" || 
+                                     formData[question] === "cambio-inmediato";
+        
+        if (shouldShowObservation) {
           if (!observations[question] || observations[question].trim() === "") {
             newObservationErrors[question] = true;
+            if (!firstErrorRef) firstErrorRef = { current: questionRefs.current[index] };
             isValid = false;
           }
         }
@@ -175,6 +226,14 @@ export default function VehicleInspectionForm() {
 
     setErrors(newErrors);
     setObservationErrors(newObservationErrors);
+    
+    // Scroll to first error if any
+    if (firstErrorRef && firstErrorRef.current) {
+      setTimeout(() => {
+        scrollToError(firstErrorRef as React.RefObject<HTMLDivElement>);
+      }, 100);
+    }
+    
     return isValid;
   };
 
@@ -189,60 +248,105 @@ export default function VehicleInspectionForm() {
     setSubmitError("");
     setSubmitSuccess(false);
     
-    // En tu handleSubmit (frontend)
     try {
-      // Prepare data (igual que antes)
-      const submissionData: Record<string, any> = {
-        "Control Calidad": qualityControlName,
+      // Prepare data for submission
+      const submissionData: any = {
+        "Formulario": "motorysamorato",
+        "Responsable": responsible,
+        "Placa Vehiculo": plateNumber,
         "Fecha de Control": controlDate,
       };
+      
+      // Add questions and answers
       questions.forEach((question, index) => {
-        const answer = formData[question] || (qualityControlOK ? "correcto" : "");
+        const answer = formData[question] || (qualityControlOK ? 
+          (question.includes("liquidos") || 
+           question.includes("Calidad de") || 
+           question.includes("Estado y daños") || 
+           question.includes("aire acondicionado") || 
+           question.includes("tablero de instrumentos") ? 
+           "buen-estado" : "cumple") : "");
+        
+        submissionData[`Pregunta ${index + 1}`] = question;
         submissionData[`Respuesta ${index + 1}`] = answer;
-        submissionData[`Observación ${index + 1}`] = answer === "deficiente" ? (observations[question] || "") : "No Aplica";
+        
+        // Add observations
+        const shouldShowObservation = answer === "no-cumple" || 
+                                     answer === "atencion-pronto" || 
+                                     answer === "cambio-inmediato";
+        
+        if (shouldShowObservation) {
+          submissionData[`Observación ${index + 1}`] = observations[question] || "";
+        } else {
+          submissionData[`Observación ${index + 1}`] = "No Aplica";
+        }
       });
-
-      // Llamamos al proxy de Vercel (misma origin) que a su vez llama al GAS
+      
+      // Send data to Google Sheets
       const response = await fetch("/api/save", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(submissionData),
       });
-
-      // Leemos la respuesta del proxy (que contiene lo que devolvió GAS)
+      
+      // Check response
       const result = await response.json();
 
       if (response.ok && result.ok) {
-        // Éxito
         setSubmitSuccess(true);
         setIsSubmitted(true);
       } else {
-        // Falló por algo (GAS devolvió error o el status no es 200)
         const errMsg = result?.data?.message || result?.error || `HTTP ${result?.status || response.status}`;
         setSubmitError("Error al guardar: " + errMsg);
       }
     } catch (error) {
-      console.error("Error en submit:", error);
+      console.error("Error submitting form:", error);
       setSubmitError("Hubo un error al enviar el formulario. Por favor intente nuevamente.");
     } finally {
       setIsSubmitting(false);
     }
-
   };
 
   const resetForm = () => {
-    setQualityControlName("");
+    setResponsible("");
+    setPlateNumber("");
     setControlDate("");
     setQualityControlOK(false);
     setFormData({});
     setObservations({});
     setErrors({});
     setObservationErrors({});
-    setQualityControlError(false);
+    setResponsibleError(false);
+    setPlateError(false);
     setDateError(false);
     setIsSubmitted(false);
     setSubmitError("");
     setSubmitSuccess(false);
+  };
+
+  const getButtonClass = (selectedValue: string, optionValue: string, baseColor: string) => {
+    const isSelected = selectedValue === optionValue;
+    const baseClasses = "flex-1 py-3 px-2 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-1";
+    
+    if (isSelected) {
+      return `${baseClasses} text-white ${baseColor} shadow-md transform scale-105`;
+    }
+    return `${baseClasses} bg-white text-gray-700 border border-gray-300 hover:bg-gray-50`;
+  };
+
+  const getSelectedOption = (question: string) => {
+    const isLiquidQuestion = question.includes("liquidos") || 
+                            question.includes("Calidad de") || 
+                            question.includes("Estado y daños") || 
+                            question.includes("aire acondicionado") || 
+                            question.includes("tablero de instrumentos");
+    
+    const options = isLiquidQuestion ? liquidOptions : answerOptions;
+    const selectedValue = formData[question];
+    
+    return options.find(option => option.value === selectedValue) || null;
   };
 
   if (isSubmitted) {
@@ -267,12 +371,20 @@ export default function VehicleInspectionForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6">
+    <div 
+      className="min-h-screen py-12 px-4 sm:px-6"
+      style={{
+        backgroundImage: "url('/img/fondo.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed"
+      }}
+    >
       <div className="max-w-6xl mx-auto">
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white/50 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-3xl font-bold text-gray-800">
-              Control de Calidad Final
+              Control de Calidad Final Motorysa Morato
             </CardTitle>
             <p className="text-gray-600 mt-2">
               Por favor seleccione el estado de cada componente del vehículo
@@ -280,28 +392,44 @@ export default function VehicleInspectionForm() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Quality Control and Date Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
+              {/* Responsible and Plate Fields */}
+              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
                 <div className="space-y-2">
-                  <Label htmlFor="qualityControl" className="text-sm font-medium text-gray-700">
-                    Control Calidad <span className="text-red-500">*</span>
+                  <Label htmlFor="responsible" className="text-sm font-medium text-gray-700">
+                    Responsable <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    id="qualityControl"
-                    value={qualityControlName}
+                    id="responsible"
+                    value={responsible}
                     onChange={(e) => {
-                      setQualityControlName(e.target.value);
-                      if (qualityControlError) setQualityControlError(false);
+                      setResponsible(e.target.value);
+                      if (responsibleError) setResponsibleError(false);
                     }}
-                    placeholder="Ingrese el nombre del control de calidad"
-                    className={qualityControlError ? "border-red-500" : ""}
+                    placeholder="Ingrese el nombre del responsable"
+                    className={responsibleError ? "border-red-500" : ""}
                   />
-                  {qualityControlError && (
-                    <p className="text-red-500 text-sm">El nombre del control de calidad es requerido</p>
+                  {responsibleError && (
+                    <p className="text-red-500 text-sm">El nombre del responsable es requerido</p>
                   )}
                 </div>
                 
-                <div className="space-y-2">
+                <div ref={plateRef} className="space-y-2">
+                  <Label htmlFor="plate" className="text-sm font-medium text-gray-700">
+                    Placa Vehiculo <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="plate"
+                    value={plateNumber}
+                    onChange={handlePlateChange}
+                    placeholder="Ingrese la placa del vehículo"
+                    className={plateError ? "border-red-500" : ""}
+                  />
+                  {plateError && (
+                    <p className="text-red-500 text-sm">La placa del vehículo es requerida</p>
+                  )}
+                </div>
+                
+                <div ref={dateRef} className="space-y-2">
                   <Label htmlFor="date" className="text-sm font-medium text-gray-700">
                     Fecha de Control <span className="text-red-500">*</span>
                   </Label>
@@ -332,57 +460,82 @@ export default function VehicleInspectionForm() {
                   htmlFor="qualityControlOK" 
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Control Calidad OK (Marcar para autocompletar todas las respuestas como "Correcto")
+                  Control Calidad OK (Marcar para autocompletar todas las respuestas)
                 </Label>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {questions.map((question, index) => (
-                  <div key={index} className="space-y-2">
-                    <label className="text-sm font-bold text-gray-800">
-                      {index + 1}. {question} <span className="text-red-500">*</span>
-                    </label>
-                    <Select
-                      value={formData[question] || ""}
-                      onValueChange={(value) => handleSelectChange(question, value)}
-                      disabled={qualityControlOK}
+              <div className="grid grid-cols-1 gap-6">
+                {questions.map((question, index) => {
+                  const isLiquidQuestion = question.includes("liquidos") || 
+                                          question.includes("Calidad de") || 
+                                          question.includes("Estado y daños") || 
+                                          question.includes("aire acondicionado") || 
+                                          question.includes("tablero de instrumentos");
+                  
+                  const options = isLiquidQuestion ? liquidOptions : answerOptions;
+                  const selectedOption = getSelectedOption(question);
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      ref={(el: HTMLDivElement | null) => { questionRefs.current[index] = el; }}
+                      className="space-y-3"
                     >
-                      <SelectTrigger className={errors[question] ? "border-red-500" : ""}>
-                        <SelectValue placeholder="Seleccione una opción" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {answerOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors[question] && !qualityControlOK && (
-                      <p className="text-red-500 text-sm">Este campo es requerido</p>
-                    )}
-                    
-                    {/* Observations field - only shown when "Deficiente" is selected */}
-                    {formData[question] === "deficiente" && (
-                      <div className="mt-3">
-                        <Label htmlFor={`observation-${index}`} className="text-sm font-medium text-gray-700">
-                          Observaciones <span className="text-red-500">*</span>
-                        </Label>
-                        <Textarea
-                          id={`observation-${index}`}
-                          value={observations[question] || ""}
-                          onChange={(e) => handleObservationChange(question, e.target.value)}
-                          placeholder="Por favor describa la deficiencia encontrada"
-                          className={`mt-1 ${observationErrors[question] ? "border-red-500" : ""}`}
-                          disabled={qualityControlOK}
-                        />
-                        {observationErrors[question] && !qualityControlOK && (
-                          <p className="text-red-500 text-sm mt-1">Las observaciones son requeridas cuando la respuesta es "Deficiente"</p>
-                        )}
+                      <label className="text-sm font-bold text-gray-800">
+                        {index + 1}. {question} <span className="text-red-500">*</span>
+                      </label>
+                      
+                      {/* Answer Buttons */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {options.map((option) => {
+                          const Icon = option.icon;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => handleSelectChange(question, option.value)}
+                              disabled={qualityControlOK}
+                              className={getButtonClass(
+                                formData[question] || "", 
+                                option.value, 
+                                option.color
+                              )}
+                            >
+                              <Icon className="w-4 h-4" />
+                              <span>{option.label}</span>
+                            </button>
+                          );
+                        })}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      
+                      {errors[question] && !qualityControlOK && (
+                        <p className="text-red-500 text-sm">Este campo es requerido</p>
+                      )}
+                      
+                      {/* Observations field - shown for specific answers */}
+                      {((formData[question] === "no-cumple" || 
+                         formData[question] === "atencion-pronto" || 
+                         formData[question] === "cambio-inmediato") && 
+                        !qualityControlOK) && (
+                        <div className="mt-3">
+                          <Label htmlFor={`observation-${index}`} className="text-sm font-medium text-gray-700">
+                            Observaciones <span className="text-red-500">*</span>
+                          </Label>
+                          <Textarea
+                            id={`observation-${index}`}
+                            value={observations[question] || ""}
+                            onChange={(e) => handleObservationChange(question, e.target.value)}
+                            placeholder="Por favor describa la deficiencia encontrada"
+                            className={`mt-1 ${observationErrors[question] ? "border-red-500" : ""}`}
+                          />
+                          {observationErrors[question] && (
+                            <p className="text-red-500 text-sm mt-1">Las observaciones son requeridas para esta respuesta</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {submitError && (
@@ -393,7 +546,7 @@ export default function VehicleInspectionForm() {
 
               {submitSuccess && (
                 <div className="text-green-600 text-center py-2">
-                  ¡Datos guardados correctamente!
+                  ¡Datos enviados correctamente a Google Sheets!
                 </div>
               )}
 
