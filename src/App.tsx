@@ -76,12 +76,18 @@ export default function VehicleInspectionForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [advisor, setAdvisor] = useState("");
+  const [technician, setTechnician] = useState("");
+  const [advisorError, setAdvisorError] = useState(false);
+  const [technicianError, setTechnicianError] = useState(false);
 
   // Refs for scrolling to errors
   const responsibleRef = useRef<HTMLDivElement | null>(null);
   const plateRef = useRef<HTMLDivElement | null>(null);
   const dateRef = useRef<HTMLDivElement | null>(null);
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const advisorRef = useRef<HTMLDivElement | null>(null);
+  const technicianRef = useRef<HTMLDivElement | null>(null);
 
   // Auto-complete form when Quality Control OK is checked
   useEffect(() => {
@@ -197,6 +203,24 @@ export default function VehicleInspectionForm() {
     } else {
       setDateError(false);
     }
+
+    // Validate advisor
+    if (!advisor.trim()) {
+      setAdvisorError(true);
+      if (!firstErrorRef) firstErrorRef = advisorRef;
+      isValid = false;
+    } else {
+      setAdvisorError(false);
+    }
+
+    // Validate technician
+    if (!technician.trim()) {
+      setTechnicianError(true);
+      if (!firstErrorRef) firstErrorRef = technicianRef;
+      isValid = false;
+    } else {
+      setTechnicianError(false);
+    }
     
     // Only validate questions if Quality Control OK is not checked
     if (!qualityControlOK) {
@@ -251,10 +275,12 @@ export default function VehicleInspectionForm() {
     try {
       // Prepare data for submission
       const submissionData: any = {
-        "Formulario": "motorysamorato",
+        "Formulario": "motorysapruebas",
         "Responsable": responsible,
         "Placa Vehiculo": plateNumber,
         "Fecha de Control": controlDate,
+        "Asesor": advisor,
+        "Tecnico": technician,
       };
       
       // Add questions and answers
@@ -324,6 +350,10 @@ export default function VehicleInspectionForm() {
     setIsSubmitted(false);
     setSubmitError("");
     setSubmitSuccess(false);
+    setAdvisor("");
+    setTechnician("");
+    setAdvisorError(false);
+    setTechnicianError(false);
   };
 
   const getButtonClass = (selectedValue: string, optionValue: string, baseColor: string) => {
@@ -393,7 +423,7 @@ export default function VehicleInspectionForm() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Responsible and Plate Fields */}
-              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
+              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
                 <div className="space-y-2">
                   <Label htmlFor="responsible" className="text-sm font-medium text-gray-700">
                     Responsable <span className="text-red-500">*</span>
@@ -445,6 +475,44 @@ export default function VehicleInspectionForm() {
                   />
                   {dateError && (
                     <p className="text-red-500 text-sm">La fecha de control es requerida</p>
+                  )}
+                </div>
+
+                <div ref={advisorRef} className="space-y-2">
+                  <Label htmlFor="advisor" className="text-sm font-medium text-gray-700">
+                    Asesor <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="advisor"
+                    value={advisor}
+                    onChange={(e) => {
+                      setAdvisor(e.target.value);
+                      if (advisorError) setAdvisorError(false);
+                    }}
+                    placeholder="Ingrese el asesor"
+                    className={advisorError ? "border-red-500" : ""}
+                  />
+                  {advisorError && (
+                    <p className="text-red-500 text-sm">El asesor es requerido</p>
+                  )}
+                </div>
+
+                <div ref={technicianRef} className="space-y-2">
+                  <Label htmlFor="technician" className="text-sm font-medium text-gray-700">
+                    Tecnico <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="technician"
+                    value={technician}
+                    onChange={(e) => {
+                      setTechnician(e.target.value);
+                      if (technicianError) setTechnicianError(false);
+                    }}
+                    placeholder="Ingrese el tecnico"
+                    className={technicianError ? "border-red-500" : ""}
+                  />
+                  {technicianError && (
+                    <p className="text-red-500 text-sm">El tecnico es requerido</p>
                   )}
                 </div>
               </div>
