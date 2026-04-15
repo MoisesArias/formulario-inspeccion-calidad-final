@@ -423,7 +423,7 @@ export default function VehicleInspectionForm() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Responsible and Plate Fields */}
-              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
+              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
                 <div className="space-y-2">
                   <Label htmlFor="responsible" className="text-sm font-medium text-gray-700">
                     Responsable <span className="text-red-500">*</span>
@@ -477,7 +477,9 @@ export default function VehicleInspectionForm() {
                     <p className="text-red-500 text-sm">La fecha de control es requerida</p>
                   )}
                 </div>
+              </div>
 
+              <div ref={responsibleRef} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-blue-50 rounded-lg">
                 <div ref={advisorRef} className="space-y-2">
                   <Label htmlFor="advisor" className="text-sm font-medium text-gray-700">
                     Asesor <span className="text-red-500">*</span>
