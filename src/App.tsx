@@ -384,7 +384,7 @@ export default function VehicleInspectionForm() {
         <Card className="shadow-lg bg-white/50 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-3xl font-bold text-gray-800">
-              Control de Calidad Final Motorysa Morato
+              Control de Calidad Final Motorysa Pruebas
             </CardTitle>
             <p className="text-gray-600 mt-2">
               Por favor seleccione el estado de cada componente del vehículo
