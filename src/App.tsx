@@ -80,6 +80,7 @@ export default function VehicleInspectionForm() {
   const [technician, setTechnician] = useState("");
   const [advisorError, setAdvisorError] = useState(false);
   const [technicianError, setTechnicianError] = useState(false);
+  const [isResponsibleFocused, setIsResponsibleFocused] = useState(false);
 
   // Refs for scrolling to errors
   const responsibleRef = useRef<HTMLDivElement | null>(null);
@@ -492,6 +493,8 @@ export default function VehicleInspectionForm() {
                     <Input
                       id="responsible"
                       value={responsible}
+                      onFocus={() => setIsResponsibleFocused(true)}
+                      onBlur={() => setIsResponsibleFocused(false)}
                       onChange={(e) => {
                         setResponsible(e.target.value);
                         if (responsibleError) setResponsibleError(false);
@@ -502,7 +505,7 @@ export default function VehicleInspectionForm() {
                     <Label
                       htmlFor="responsible"
                       className={`absolute left-3 transition-all duration-200 px-1
-                        ${responsible
+                        ${(responsible || isResponsibleFocused)
                           ? "-top-2 text-xs text-blue-600"
                           : "top-3 text-base text-gray-400"}
                       `}
