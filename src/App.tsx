@@ -485,8 +485,7 @@ export default function VehicleInspectionForm() {
                 {/* Primera fila */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Responsable */}
-                  <div ref={responsibleRef} className="space-y-2">
-                    <Label htmlFor="responsible">Responsable <span className="text-red-500">*</span></Label>
+                  <div ref={responsibleRef} className="relative">
                     <Input
                       id="responsible"
                       value={responsible}
@@ -494,10 +493,28 @@ export default function VehicleInspectionForm() {
                         setResponsible(e.target.value);
                         if (responsibleError) setResponsibleError(false);
                       }}
-                      placeholder="Ingrese el nombre del responsable"
-                      className={responsibleError ? "border-red-500" : ""}
+                      placeholder=" "
+                      className={`peer pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
                     />
-                    {responsibleError && <p className="text-red-500 text-sm">El nombre del responsable es requerido</p>}
+                    
+                    <Label
+                      htmlFor="responsible"
+                      className="absolute left-3 top-2 text-gray-500 text-sm transition-all
+                                peer-placeholder-shown:top-3.5
+                                peer-placeholder-shown:text-base
+                                peer-placeholder-shown:text-gray-400
+                                peer-focus:top-2
+                                peer-focus:text-sm
+                                peer-focus:text-blue-600"
+                    >
+                      Responsable <span className="text-red-500">*</span>
+                    </Label>
+
+                    {responsibleError && (
+                      <p className="text-red-500 text-sm mt-1">
+                        El nombre del responsable es requerido
+                      </p>
+                    )}
                   </div>
 
                   {/* Placa */}
