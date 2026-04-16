@@ -445,7 +445,10 @@ export default function VehicleInspectionForm() {
             <p className="text-gray-600 mb-6">
               El control de calidad del vehículo ha sido registrado exitosamente.
             </p>
-            <Button onClick={resetForm} className="w-full max-w-xs">
+            <Button 
+              onClick={resetForm} 
+              className="w-full max-w-xs px-4 py-3 text-sm md:text-base whitespace-normal text-center break-words flex items-center justify-center"
+            >
               Realizar Nuevo Control de Calidad
             </Button>
           </CardContent>
@@ -675,7 +678,7 @@ export default function VehicleInspectionForm() {
               <div className="pt-4">
                 <Button 
                   type="submit" 
-                  className="w-full py-6 text-lg"
+                  className="w-full py-4 px-4 text-sm md:text-lg whitespace-normal text-center break-words flex items-center justify-center"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
