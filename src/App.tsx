@@ -60,9 +60,10 @@ const liquidOptions = [
   { value: "n-a", label: "N/A", icon: MinusCircle, color: "bg-gray-500" },
 ];
 
-interface FloatingInputProps {
+type FloatingInputProps {
   id: string;
   label: string;
+  type?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: boolean;
@@ -75,6 +76,7 @@ interface FloatingInputProps {
 const FloatingInput = ({
   id,
   label,
+  type = "text",
   value,
   onChange,
   error,
@@ -104,7 +106,7 @@ const FloatingInput = ({
 
       <Label
         htmlFor={id}
-        className={`absolute left-3 transition-all duration-200 bg-white px-1
+        className={`absolute left-3 transition-all duration-200 bg-blue-50 px-1
           ${(value || isFocused)
             ? "-top-2 text-xs text-blue-600"
             : "top-3 text-base text-gray-400"}
@@ -570,20 +572,19 @@ export default function VehicleInspectionForm() {
                     inputRef={plateRef}
                   />
 
-                  <div ref={dateRef} className="space-y-2">
-                    <Label htmlFor="date">Fecha de Control <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={controlDate}
-                      onChange={(e) => {
-                        setControlDate(e.target.value);
-                        if (dateError) setDateError(false);
-                      }}
-                      className={dateError ? "border-red-500" : ""}
-                    />
-                    {dateError && <p className="text-red-500 text-sm">La fecha de control es requerida</p>}
-                  </div>
+                  <FloatingInput
+                    id="date"
+                    label="Fecha de Control"
+                    type="date"
+                    value={controlDate}
+                    onChange={(e) => {
+                      setControlDate(e.target.value);
+                      if (dateError) setDateError(false);
+                    }}
+                    error={dateError}
+                    errorMessage="La fecha de control es requerida"
+                    inputRef={dateRef}
+                  />
 
                 </div>
 
