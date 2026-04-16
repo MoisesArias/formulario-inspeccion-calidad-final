@@ -60,6 +60,68 @@ const liquidOptions = [
   { value: "n-a", label: "N/A", icon: MinusCircle, color: "bg-gray-500" },
 ];
 
+interface FloatingInputProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: boolean;
+  errorMessage?: string;
+  inputRef?: React.RefObject<HTMLDivElement | null>;
+  onFocus?: () => void;
+  onBlur?: () => void;
+}
+
+const FloatingInput = ({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  errorMessage,
+  inputRef,
+  onFocus,
+  onBlur
+}: FloatingInputProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  return (
+    <div ref={inputRef} className="relative">
+      <Input
+        id={id}
+        value={value}
+        onFocus={() => {
+          setIsFocused(true);
+          onFocus && onFocus();
+        }}
+        onBlur={() => {
+          setIsFocused(false);
+          onBlur && onBlur();
+        }}
+        onChange={onChange}
+        className={`pt-6 pb-2 ${error ? "border-red-500" : ""}`}
+      />
+
+      <Label
+        htmlFor={id}
+        className={`absolute left-3 transition-all duration-200 bg-white px-1
+          ${(value || isFocused)
+            ? "-top-2 text-xs text-blue-600"
+            : "top-3 text-base text-gray-400"}
+        `}
+      >
+        {label} <span className="text-red-500">*</span>
+      </Label>
+
+      {error && (
+        <p className="text-red-500 text-sm mt-1">
+          {errorMessage}
+        </p>
+      )}
+    </div>
+  );
+};
+
 export default function VehicleInspectionForm() {
   const [responsible, setResponsible] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
@@ -80,7 +142,6 @@ export default function VehicleInspectionForm() {
   const [technician, setTechnician] = useState("");
   const [advisorError, setAdvisorError] = useState(false);
   const [technicianError, setTechnicianError] = useState(false);
-  const [isResponsibleFocused, setIsResponsibleFocused] = useState(false);
 
   // Refs for scrolling to errors
   const responsibleRef = useRef<HTMLDivElement | null>(null);
@@ -485,77 +546,30 @@ export default function VehicleInspectionForm() {
                 
                 {/* Primera fila */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Responsable */}
-                  <div
-                    ref={responsibleRef}
-                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
-                  >
-                    <Input
-                      id="responsible"
-                      value={responsible}
-                      onFocus={() => setIsResponsibleFocused(true)}
-                      onBlur={() => setIsResponsibleFocused(false)}
-                      onChange={(e) => {
-                        setResponsible(e.target.value);
-                        if (responsibleError) setResponsibleError(false);
-                      }}
-                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
-                    />
-                    
-                    <Label
-                      htmlFor="responsible"
-                      className={`absolute left-3 transition-all duration-200 px-1
-                        ${(responsible || isResponsibleFocused)
-                          ? "-top-2 text-xs text-blue-600"
-                          : "top-3 text-base text-gray-400"}
-                      `}
-                    >
-                      Responsable <span className="text-red-500">*</span>
-                    </Label>
+                  
+                  <FloatingInput
+                    id="responsible"
+                    label="Responsable"
+                    value={responsible}
+                    onChange={(e) => {
+                      setResponsible(e.target.value);
+                      if (responsibleError) setResponsibleError(false);
+                    }}
+                    error={responsibleError}
+                    errorMessage="El nombre del responsable es requerido"
+                    inputRef={responsibleRef}
+                  />
 
-                    {responsibleError && (
-                      <p className="text-red-500 text-sm mt-1">
-                        El nombre del responsable es requerido
-                      </p>
-                    )}
-                  </div>
+                  <FloatingInput
+                    id="plate"
+                    label="Placa Vehiculo"
+                    value={plateNumber}
+                    onChange={handlePlateChange}
+                    error={plateError}
+                    errorMessage="La placa del vehículo es requerida"
+                    inputRef={plateRef}
+                  />
 
-                  {/* Placa */}
-                  <div
-                    ref={responsibleRef}
-                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
-                  >
-                    <Input
-                      id="responsible"
-                      value={responsible}
-                      onFocus={() => setIsResponsibleFocused(true)}
-                      onBlur={() => setIsResponsibleFocused(false)}
-                      onChange={(e) => {
-                        setResponsible(e.target.value);
-                        if (responsibleError) setResponsibleError(false);
-                      }}
-                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
-                    />
-                    
-                    <Label
-                      htmlFor="responsible"
-                      className={`absolute left-3 transition-all duration-200 px-1
-                        ${(responsible || isResponsibleFocused)
-                          ? "-top-2 text-xs text-blue-600"
-                          : "top-3 text-base text-gray-400"}
-                      `}
-                    >
-                      Placa Vehiculo <span className="text-red-500">*</span>
-                    </Label>
-
-                    {responsibleError && (
-                      <p className="text-red-500 text-sm mt-1">
-                        La pĺaca del vehiculo es requerida
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Fecha */}
                   <div ref={dateRef} className="space-y-2">
                     <Label htmlFor="date">Fecha de Control <span className="text-red-500">*</span></Label>
                     <Input
@@ -570,79 +584,38 @@ export default function VehicleInspectionForm() {
                     />
                     {dateError && <p className="text-red-500 text-sm">La fecha de control es requerida</p>}
                   </div>
+
                 </div>
 
                 {/* Segunda fila */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Asesor */}
-                  <div
-                    ref={responsibleRef}
-                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
-                  >
-                    <Input
-                      id="responsible"
-                      value={responsible}
-                      onFocus={() => setIsResponsibleFocused(true)}
-                      onBlur={() => setIsResponsibleFocused(false)}
-                      onChange={(e) => {
-                        setResponsible(e.target.value);
-                        if (responsibleError) setResponsibleError(false);
-                      }}
-                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
-                    />
-                    
-                    <Label
-                      htmlFor="responsible"
-                      className={`absolute left-3 transition-all duration-200 px-1
-                        ${(responsible || isResponsibleFocused)
-                          ? "-top-2 text-xs text-blue-600"
-                          : "top-3 text-base text-gray-400"}
-                      `}
-                    >
-                      Asesor <span className="text-red-500">*</span>
-                    </Label>
 
-                    {responsibleError && (
-                      <p className="text-red-500 text-sm mt-1">
-                        El nombre del asesor es requerido
-                      </p>
-                    )}
-                  </div>
+                  <FloatingInput
+                    id="advisor"
+                    label="Asesor"
+                    value={advisor}
+                    onChange={(e) => {
+                      setAdvisor(e.target.value);
+                      if (advisorError) setAdvisorError(false);
+                    }}
+                    error={advisorError}
+                    errorMessage="El asesor es requerido"
+                    inputRef={advisorRef}
+                  />
 
-                  {/* Técnico */}
-                  <div
-                    ref={responsibleRef}
-                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
-                  >
-                    <Input
-                      id="responsible"
-                      value={responsible}
-                      onFocus={() => setIsResponsibleFocused(true)}
-                      onBlur={() => setIsResponsibleFocused(false)}
-                      onChange={(e) => {
-                        setResponsible(e.target.value);
-                        if (responsibleError) setResponsibleError(false);
-                      }}
-                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
-                    />
-                    
-                    <Label
-                      htmlFor="responsible"
-                      className={`absolute left-3 transition-all duration-200 px-1
-                        ${(responsible || isResponsibleFocused)
-                          ? "-top-2 text-xs text-blue-600"
-                          : "top-3 text-base text-gray-400"}
-                      `}
-                    >
-                      Tecnico <span className="text-red-500">*</span>
-                    </Label>
+                  <FloatingInput
+                    id="technician"
+                    label="Tecnico"
+                    value={technician}
+                    onChange={(e) => {
+                      setTechnician(e.target.value);
+                      if (technicianError) setTechnicianError(false);
+                    }}
+                    error={technicianError}
+                    errorMessage="El tecnico es requerido"
+                    inputRef={technicianRef}
+                  />
 
-                    {responsibleError && (
-                      <p className="text-red-500 text-sm mt-1">
-                        El nombre del tecnico es requerido
-                      </p>
-                    )}
-                  </div>
                 </div>
 
               </div>
