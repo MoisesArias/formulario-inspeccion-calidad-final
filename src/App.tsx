@@ -60,7 +60,7 @@ const liquidOptions = [
   { value: "n-a", label: "N/A", icon: MinusCircle, color: "bg-gray-500" },
 ];
 
-type FloatingInputProps {
+type FloatingInputProps = {
   id: string;
   label: string;
   type?: string;
@@ -574,8 +574,8 @@ export default function VehicleInspectionForm() {
 
                   <FloatingInput
                     id="date"
+                    type={type}
                     label="Fecha de Control"
-                    type="date"
                     value={controlDate}
                     onChange={(e) => {
                       setControlDate(e.target.value);
