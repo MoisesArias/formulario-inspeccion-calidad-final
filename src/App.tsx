@@ -120,6 +120,35 @@ export default function VehicleInspectionForm() {
     isManualToggle.current = false;
   }, [qualityControlOK]);
 
+  useEffect(() => {
+    // Si no hay respuestas, no hacer nada
+    if (Object.keys(formData).length === 0) return;
+
+    const allCorrect = questions.every((question) => {
+      const answer = formData[question];
+
+      const isLiquidQuestion =
+        question.includes("liquidos") ||
+        question.includes("Calidad de") ||
+        question.includes("Estado y daños") ||
+        question.includes("aire acondicionado") ||
+        question.includes("tablero de instrumentos");
+
+      if (isLiquidQuestion) {
+        return answer === "buen-estado";
+      }
+
+      return answer === "cumple";
+    });
+
+    if (allCorrect && !qualityControlOK) {
+      // 🔥 marcar automáticamente sin limpiar nada
+      isManualToggle.current = false;
+      setQualityControlOK(true);
+    }
+
+  }, [formData]);
+
   const handleSelectChange = (name: string, value: string) => {
     if (qualityControlOK) {
       isManualToggle.current = false;
