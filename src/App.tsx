@@ -108,6 +108,11 @@ export default function VehicleInspectionForm() {
       setObservations({});
       setObservationErrors({});
       setErrors({});
+    } else {
+      setFormData({});
+      setObservations({});
+      setObservationErrors({});
+      setErrors({});
     }
   }, [qualityControlOK]);
 
@@ -587,7 +592,7 @@ export default function VehicleInspectionForm() {
                             value={observations[question] || ""}
                             onChange={(e) => handleObservationChange(question, e.target.value)}
                             placeholder="Por favor describa la deficiencia encontrada"
-                            className={`mt-1 ${observationErrors[question] ? "border-red-500" : ""}`}
+                            className={`mt-1 bg-white ${observationErrors[question] ? "border-red-500" : ""}`}
                           />
                           {observationErrors[question] && (
                             <p className="text-red-500 text-sm mt-1">Las observaciones son requeridas para esta respuesta</p>
