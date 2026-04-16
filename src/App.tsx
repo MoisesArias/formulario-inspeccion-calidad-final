@@ -493,19 +493,16 @@ export default function VehicleInspectionForm() {
                         setResponsible(e.target.value);
                         if (responsibleError) setResponsibleError(false);
                       }}
-                      placeholder=" "
-                      className={`peer pt- pb-2 ${responsibleError ? "border-red-500" : ""}`}
+                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
                     />
                     
                     <Label
                       htmlFor="responsible"
-                      className="absolute left-3 bg-white px-1 text-gray-500 text-sm transition-all duration-200
-                                peer-placeholder-shown:top-3.5
-                                peer-placeholder-shown:text-base
-                                peer-placeholder-shown:text-gray-400
-                                peer-focus:top-2
-                                peer-focus:text-xs
-                                peer-focus:text-blue-600"
+                      className={`absolute left-3 transition-all duration-200 bg-white px-1
+                        ${responsible
+                          ? "-top-2 text-xs text-blue-600"
+                          : "top-3 text-base text-gray-400"}
+                      `}
                     >
                       Responsable <span className="text-red-500">*</span>
                     </Label>
