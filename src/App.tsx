@@ -521,16 +521,38 @@ export default function VehicleInspectionForm() {
                   </div>
 
                   {/* Placa */}
-                  <div ref={plateRef} className="space-y-2">
-                    <Label htmlFor="plate">Placa Vehiculo <span className="text-red-500">*</span></Label>
+                  <div
+                    ref={responsibleRef}
+                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
+                  >
                     <Input
-                      id="plate"
-                      value={plateNumber}
-                      onChange={handlePlateChange}
-                      placeholder="Ingrese la placa del vehículo"
-                      className={plateError ? "border-red-500" : ""}
+                      id="responsible"
+                      value={responsible}
+                      onFocus={() => setIsResponsibleFocused(true)}
+                      onBlur={() => setIsResponsibleFocused(false)}
+                      onChange={(e) => {
+                        setResponsible(e.target.value);
+                        if (responsibleError) setResponsibleError(false);
+                      }}
+                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
                     />
-                    {plateError && <p className="text-red-500 text-sm">La placa del vehículo es requerida</p>}
+                    
+                    <Label
+                      htmlFor="responsible"
+                      className={`absolute left-3 transition-all duration-200 px-1
+                        ${(responsible || isResponsibleFocused)
+                          ? "-top-2 text-xs text-blue-600"
+                          : "top-3 text-base text-gray-400"}
+                      `}
+                    >
+                      Placa Vehiculo <span className="text-red-500">*</span>
+                    </Label>
+
+                    {responsibleError && (
+                      <p className="text-red-500 text-sm mt-1">
+                        La pĺaca del vehiculo es requerida
+                      </p>
+                    )}
                   </div>
 
                   {/* Fecha */}
@@ -553,35 +575,73 @@ export default function VehicleInspectionForm() {
                 {/* Segunda fila */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Asesor */}
-                  <div ref={advisorRef} className="space-y-2">
-                    <Label htmlFor="advisor">Asesor <span className="text-red-500">*</span></Label>
+                  <div
+                    ref={responsibleRef}
+                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
+                  >
                     <Input
-                      id="advisor"
-                      value={advisor}
+                      id="responsible"
+                      value={responsible}
+                      onFocus={() => setIsResponsibleFocused(true)}
+                      onBlur={() => setIsResponsibleFocused(false)}
                       onChange={(e) => {
-                        setAdvisor(e.target.value);
-                        if (advisorError) setAdvisorError(false);
+                        setResponsible(e.target.value);
+                        if (responsibleError) setResponsibleError(false);
                       }}
-                      placeholder="Ingrese el nombre del asesor"
-                      className={advisorError ? "border-red-500" : ""}
+                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
                     />
-                    {advisorError && <p className="text-red-500 text-sm">El asesor es requerido</p>}
+                    
+                    <Label
+                      htmlFor="responsible"
+                      className={`absolute left-3 transition-all duration-200 px-1
+                        ${(responsible || isResponsibleFocused)
+                          ? "-top-2 text-xs text-blue-600"
+                          : "top-3 text-base text-gray-400"}
+                      `}
+                    >
+                      Asesor <span className="text-red-500">*</span>
+                    </Label>
+
+                    {responsibleError && (
+                      <p className="text-red-500 text-sm mt-1">
+                        El nombre del asesor es requerido
+                      </p>
+                    )}
                   </div>
 
                   {/* Técnico */}
-                  <div ref={technicianRef} className="space-y-2">
-                    <Label htmlFor="technician">Tecnico <span className="text-red-500">*</span></Label>
+                  <div
+                    ref={responsibleRef}
+                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
+                  >
                     <Input
-                      id="technician"
-                      value={technician}
+                      id="responsible"
+                      value={responsible}
+                      onFocus={() => setIsResponsibleFocused(true)}
+                      onBlur={() => setIsResponsibleFocused(false)}
                       onChange={(e) => {
-                        setTechnician(e.target.value);
-                        if (technicianError) setTechnicianError(false);
+                        setResponsible(e.target.value);
+                        if (responsibleError) setResponsibleError(false);
                       }}
-                      placeholder="Ingrese el nombre del tecnico"
-                      className={technicianError ? "border-red-500" : ""}
+                      className={`pt-6 pb-2 ${responsibleError ? "border-red-500" : ""}`}
                     />
-                    {technicianError && <p className="text-red-500 text-sm">El tecnico es requerido</p>}
+                    
+                    <Label
+                      htmlFor="responsible"
+                      className={`absolute left-3 transition-all duration-200 px-1
+                        ${(responsible || isResponsibleFocused)
+                          ? "-top-2 text-xs text-blue-600"
+                          : "top-3 text-base text-gray-400"}
+                      `}
+                    >
+                      Tecnico <span className="text-red-500">*</span>
+                    </Label>
+
+                    {responsibleError && (
+                      <p className="text-red-500 text-sm mt-1">
+                        El nombre del tecnico es requerido
+                      </p>
+                    )}
                   </div>
                 </div>
 
