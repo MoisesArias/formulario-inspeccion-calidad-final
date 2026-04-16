@@ -117,7 +117,18 @@ export default function VehicleInspectionForm() {
   }, [qualityControlOK]);
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const currentValue = prev[name];
+
+      // 🔥 Si ya está seleccionado, lo deselecciona
+      if (currentValue === value) {
+        const newData = { ...prev };
+        delete newData[name];
+        return newData;
+      }
+
+      return { ...prev, [name]: value };
+    });
     
     // Clear observation if not an observation-triggering value
     const shouldShowObservation = value === "no-cumple" || value === "atencion-pronto" || value === "cambio-inmediato";
@@ -560,7 +571,7 @@ export default function VehicleInspectionForm() {
                               key={option.value}
                               type="button"
                               onClick={() => handleSelectChange(question, option.value)}
-                              disabled={qualityControlOK}
+                              // disabled={qualityControlOK}
                               className={getButtonClass(
                                 formData[question] || "", 
                                 option.value, 
