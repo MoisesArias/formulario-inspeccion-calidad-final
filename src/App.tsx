@@ -117,6 +117,10 @@ export default function VehicleInspectionForm() {
   }, [qualityControlOK]);
 
   const handleSelectChange = (name: string, value: string) => {
+    if (qualityControlOK) {
+      setQualityControlOK(false);
+    }
+    
     setFormData((prev) => {
       const currentValue = prev[name];
 
@@ -590,10 +594,11 @@ export default function VehicleInspectionForm() {
                       )}
                       
                       {/* Observations field - shown for specific answers */}
-                      {((formData[question] === "no-cumple" || 
-                         formData[question] === "atencion-pronto" || 
-                         formData[question] === "cambio-inmediato") && 
-                        !qualityControlOK) && (
+                      {const showObservation =
+                        formData[question] === "no-cumple" || 
+                        formData[question] === "atencion-pronto" || 
+                        formData[question] === "cambio-inmediato";
+                        showObservation && (
                         <div className="mt-3">
                           <Label htmlFor={`observation-${index}`} className="text-sm font-medium text-gray-700">
                             Observaciones <span className="text-red-500">*</span>
