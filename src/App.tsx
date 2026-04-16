@@ -91,6 +91,7 @@ const FloatingInput = ({
     <div ref={inputRef} className="relative">
       <Input
         id={id}
+        type={type}
         value={value}
         onFocus={() => {
           setIsFocused(true);
@@ -574,7 +575,7 @@ export default function VehicleInspectionForm() {
 
                   <FloatingInput
                     id="date"
-                    type={type}
+                    type="date"
                     label="Fecha de Control"
                     value={controlDate}
                     onChange={(e) => {
