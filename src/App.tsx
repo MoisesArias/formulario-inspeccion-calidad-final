@@ -88,6 +88,7 @@ export default function VehicleInspectionForm() {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const advisorRef = useRef<HTMLDivElement | null>(null);
   const technicianRef = useRef<HTMLDivElement | null>(null);
+  const isManualToggle = useRef(false);
 
   // Auto-complete form when Quality Control OK is checked
   useEffect(() => {
@@ -109,15 +110,19 @@ export default function VehicleInspectionForm() {
       setObservationErrors({});
       setErrors({});
     } else {
-      setFormData({});
-      setObservations({});
-      setObservationErrors({});
-      setErrors({});
+      if (isManualToggle.current) {
+        setFormData({});
+        setObservations({});
+        setObservationErrors({});
+        setErrors({});
+      }
     }
+    isManualToggle.current = false;
   }, [qualityControlOK]);
 
   const handleSelectChange = (name: string, value: string) => {
     if (qualityControlOK) {
+      isManualToggle.current = false;
       setQualityControlOK(false);
     }
     
@@ -535,7 +540,10 @@ export default function VehicleInspectionForm() {
                 <Checkbox
                   id="qualityControlOK"
                   checked={qualityControlOK}
-                  onCheckedChange={(checked) => setQualityControlOK(checked as boolean)}
+                  onCheckedChange={(checked) => {
+                    isManualToggle.current = true;
+                    setQualityControlOK(checked as boolean);
+                  }}
                 />
                 <Label 
                   htmlFor="qualityControlOK" 
