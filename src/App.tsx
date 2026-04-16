@@ -498,7 +498,7 @@ export default function VehicleInspectionForm() {
                     
                     <Label
                       htmlFor="responsible"
-                      className={`absolute left-3 transition-all duration-200 bg-white px-1
+                      className={`absolute left-3 transition-all duration-200 px-1
                         ${responsible
                           ? "-top-2 text-xs text-blue-600"
                           : "top-3 text-base text-gray-400"}
