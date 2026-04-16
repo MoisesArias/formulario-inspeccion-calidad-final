@@ -485,7 +485,10 @@ export default function VehicleInspectionForm() {
                 {/* Primera fila */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Responsable */}
-                  <div ref={responsibleRef} className="relative">
+                  <div
+                    ref={responsibleRef}
+                    className={`relative ${!responsible ? "focus-within:[&>label]:-top-2 focus-within:[&>label]:text-xs focus-within:[&>label]:text-blue-600" : ""}`}
+                  >
                     <Input
                       id="responsible"
                       value={responsible}
