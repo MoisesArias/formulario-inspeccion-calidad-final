@@ -547,6 +547,11 @@ export default function VehicleInspectionForm() {
               
               <div className="grid grid-cols-1 gap-6">
                 {questions.map((question, index) => {
+                  const showObservation =
+                                          formData[question] === "no-cumple" || 
+                                          formData[question] === "atencion-pronto" || 
+                                          formData[question] === "cambio-inmediato";
+
                   const isLiquidQuestion = question.includes("liquidos") || 
                                           question.includes("Calidad de") || 
                                           question.includes("Estado y daños") || 
@@ -594,11 +599,7 @@ export default function VehicleInspectionForm() {
                       )}
                       
                       {/* Observations field - shown for specific answers */}
-                      {const showObservation =
-                        formData[question] === "no-cumple" || 
-                        formData[question] === "atencion-pronto" || 
-                        formData[question] === "cambio-inmediato";
-                        showObservation && (
+                      {showObservation && (
                         <div className="mt-3">
                           <Label htmlFor={`observation-${index}`} className="text-sm font-medium text-gray-700">
                             Observaciones <span className="text-red-500">*</span>
@@ -611,7 +612,9 @@ export default function VehicleInspectionForm() {
                             className={`mt-1 bg-white ${observationErrors[question] ? "border-red-500" : ""}`}
                           />
                           {observationErrors[question] && (
-                            <p className="text-red-500 text-sm mt-1">Las observaciones son requeridas para esta respuesta</p>
+                            <p className="text-red-500 text-sm mt-1">
+                              Las observaciones son requeridas para esta respuesta
+                            </p>
                           )}
                         </div>
                       )}
